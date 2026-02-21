@@ -1,0 +1,133 @@
+{
+  "contacts": [
+    {
+      "id": "c1771640988867893",
+      "first": "Cool",
+      "last": "Worlds Podcast",
+      "initials": "CW",
+      "phone": "",
+      "email": "",
+      "color": "#FFA31A",
+      "socials": {
+        "twitter": "",
+        "linkedin": "",
+        "instagram": "",
+        "youtube": "https://www.youtube.com/@CoolWorldsPodcast",
+        "whatsapp": "",
+        "url": ""
+      }
+    },
+    {
+      "id": "c177164090509222",
+      "first": "Event",
+      "last": "Horizon",
+      "initials": "EH",
+      "phone": "",
+      "email": "",
+      "color": "#FF4757",
+      "socials": {
+        "twitter": "",
+        "linkedin": "",
+        "instagram": "",
+        "youtube": "https://www.youtube.com/@EventHorizonShow",
+        "whatsapp": "",
+        "url": ""
+      }
+    },
+    {
+      "id": "c1771641082258255",
+      "first": "Harvard",
+      "last": "Univeristy",
+      "initials": "HU",
+      "phone": "",
+      "email": "",
+      "color": "#FFA31A",
+      "socials": {
+        "twitter": "",
+        "linkedin": "",
+        "instagram": "",
+        "youtube": "https://www.youtube.com/@harvard/videos",
+        "whatsapp": "",
+        "url": ""
+      }
+    },
+    {
+      "id": "c1771640847533715",
+      "first": "PBS SPACE TIME",
+      "last": "",
+      "initials": "P",
+      "phone": "",
+      "email": "",
+      "color": "#2E81FF",
+      "socials": {
+        "twitter": "",
+        "linkedin": "",
+        "instagram": "",
+        "youtube": "https://www.youtube.com/@pbsspacetime",
+        "whatsapp": "",
+        "url": ""
+      }
+    },
+    {
+      "id": "c1771641035859313",
+      "first": "Professor",
+      "last": "Dave Explains",
+      "initials": "PD",
+      "phone": "",
+      "email": "",
+      "color": "#FFA31A",
+      "socials": {
+        "twitter": "",
+        "linkedin": "",
+        "instagram": "",
+        "youtube": "https://www.youtube.com/@ProfessorDaveExplains",
+        "whatsapp": "",
+        "url": ""
+      }
+    },
+    {
+      "id": "c1771641170923615",
+      "first": "Steven",
+      "last": "Scott",
+      "initials": "SS",
+      "phone": "+44 012345678910",
+      "email": "myemail@gmail.com",
+      "color": "#6C5CE7",
+      "socials": {
+        "twitter": "https://x.com/IdoineTutorials",
+        "linkedin": "",
+        "instagram": "",
+        "youtube": "https://www.youtube.com/@StevenScott_studio53",
+        "whatsapp": "",
+        "url": ""
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "all",
+      "name": "All Contacts",
+      "contacts": [],
+      "isDefault": true
+    },
+    {
+      "id": "g_studio_os",
+      "name": "Studio OS",
+      "contacts": [
+        "c1771641170923615"
+      ]
+    },
+    {
+      "id": "grp_1771640782029",
+      "name": "Youtube - Channels",
+      "color": "#FF4757",
+      "contacts": [
+        "c1771640847533715",
+        "c177164090509222",
+        "c1771640988867893",
+        "c1771641035859313",
+        "c1771641082258255"
+      ]
+    }
+  ]
+}

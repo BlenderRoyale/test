@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Bubbles — A physics-based contact manager with gooey animations, drag interactions, and sound effects.">
+    <title>Bubbles — Contact Manager</title>
+    <link rel="stylesheet" href="bubbles.css">
+    <style>
+        /* Full-viewport reset for standalone mode */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0D0D12;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #EAEAEA;
+        }
+
+        .bubble-contact-app {
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- App shell is embedded directly from the template -->
+    <div class="bubble-contact-app">
+        <div class="bc-sidebar">
+            <div class="bc-header">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <svg class="bc-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg" style="width: 26px; height: 26px;">
+                        <circle cx="15" cy="15" r="5"></circle>
+                        <circle cx="9" cy="9" r="4"></circle>
+                        <circle cx="16" cy="6" r="3"></circle>
+                    </svg>
+                    <h2>Bubbles</h2>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="bc-header-circle-btn bc-header-bubble-btn" id="bc-btn-add-bubble-sidebar"
+                        title="Create Bubble Group">
+                        <svg width="18" height="18" viewBox="-2 -2 28 28" fill="none" stroke="currentColor"
+                            stroke-width="2" style="overflow: visible;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"></circle>
+                            <circle cx="22" cy="4" r="2.5" fill="currentColor" stroke="none"></circle>
+                            <circle cx="20" cy="20" r="1.8" fill="currentColor" stroke="none"></circle>
+                        </svg>
+                    </button>
+                    <button class="bc-header-circle-btn" id="bc-btn-add-contact-sidebar" title="Add Bubble">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="3">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bc-search-container">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="margin-right: 8px; opacity: 0.5;">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input id="bc-search-input" type="text" placeholder="Search bubbles...">
+            </div>
+
+            <div class="bc-groups" id="bc-sidebar-groups"></div>
+
+            <div style="flex-grow: 1;"></div>
+            <div class="bc-sidebar-footer" style="display: flex; align-items: center; gap: 12px;">
+                <button class="bc-footer-btn" title="Settings" id="bc-btn-settings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="bc-main">
+            <div class="bc-main-header">
+                <div style="display: flex; align-items: center; gap: 12px; height: 40px;">
+                    <h1 class="bc-main-title" id="bc-main-title" style="margin: 0;">All Bubbles</h1>
+                </div>
+                <div class="bc-actions">
+                    <button title="Toggle View" id="bc-toggle-bubble" class="bc-view-toggle-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5">
+                            <circle cx="15" cy="15" r="5"></circle>
+                            <circle cx="9" cy="9" r="4"></circle>
+                            <circle cx="16" cy="6" r="3"></circle>
+                        </svg>
+                        <span>BUBBLES</span>
+                    </button>
+                    <button class="bc-btn-primary" id="bc-btn-add-group" style="display: none;">+</button>
+                </div>
+            </div>
+
+            <div class="bc-view-container">
+                <div class="bc-list-view" id="bc-list-view">
+                    <div class="bc-list-header">
+                        <div>NAME</div>
+                        <div>PHONE</div>
+                        <div>EMAIL</div>
+                        <div>SOCIALS</div>
+                    </div>
+                    <div class="bc-contacts-container" id="bc-contacts-container"></div>
+                </div>
+
+                <div class="bc-secondary-sidebar" id="bc-secondary-sidebar" style="display: none;">
+                    <div class="bc-sec-header">
+                        <div id="bc-sec-header-action" style="flex-grow: 1;"></div>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="bc-btn-close-sec">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bc-sec-content" id="bc-sec-list"></div>
+                </div>
+
+                <div class="bc-bubble-view" id="bc-bubble-view" style="display: none;">
+                    <div id="bc-canvas-filter" class="bc-canvas-filter" title="Filter: All">
+                        <svg id="bc-canvas-filter-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <circle cx="8" cy="14" r="5" />
+                            <circle cx="16" cy="10" r="5" />
+                        </svg>
+                    </div>
+                    <div id="bc-pop-counter" class="bc-pop-counter" style="display: none;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M8 12l2-3 4 6" />
+                        </svg>
+                        Pop Count : <span id="bc-pop-count">0</span>
+                    </div>
+                    <div id="bc-bg-particles" style="z-index: 0;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Group Modal -->
+        <div class="bc-modal-overlay" id="bc-add-group-modal" style="display: none;">
+            <div class="bc-modal">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                    <h3 class="bc-modal-title" id="bc-group-modal-title" style="margin: 0; font-size: 18px;">CREATE
+                        BUBBLE</h3>
+                    <button class="bc-btn-cancel bc-group-edit-only" id="bc-btn-delete-group"
+                        style="display: none; color: var(--bc-text-muted); background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); cursor: pointer;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                            </path>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                        </svg>
+                    </button>
+                </div>
+                <input type="text" class="bc-modal-input" placeholder="Group Name e.g. Family" id="bc-group-name-input">
+                <h3 class="bc-modal-title" style="margin-top: 8px;">Bubble Group Colour</h3>
+                <div class="bc-color-picker" id="bc-color-picker">
+                    <div class="bc-color-swatch selected" data-color="var(--bc-color-d)"
+                        style="background: var(--bc-color-d)"></div>
+                    <div class="bc-color-swatch" data-color="var(--bc-color-a)" style="background: var(--bc-color-a)">
+                    </div>
+                    <div class="bc-color-swatch" data-color="var(--bc-color-b)" style="background: var(--bc-color-b)">
+                    </div>
+                    <div class="bc-color-swatch" data-color="var(--bc-color-c)" style="background: var(--bc-color-c)">
+                    </div>
+                    <div class="bc-color-swatch" data-color="var(--bc-color-e)" style="background: var(--bc-color-e)">
+                    </div>
+                    <div class="bc-color-swatch" data-color="transparent"
+                        style="background: var(--bc-color-trans); border: 1px solid rgba(255,255,255,0.3);"></div>
+                </div>
+                <h3 class="bc-modal-title bc-group-edit-only" style="margin-top: 8px; display: none;">Group Members</h3>
+                <div class="bc-group-edit-only" id="bc-group-members-list"
+                    style="display: none; max-height: 180px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 6px; padding: 8px; flex-direction: column; gap: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                </div>
+                <div class="bc-modal-actions"
+                    style="margin-top: 4px; display: flex; justify-content: flex-end; width: 100%;">
+                    <div style="display: flex; gap: 12px;">
+                        <button class="bc-btn-cancel" id="bc-btn-cancel-group">Cancel</button>
+                        <button class="bc-btn-create" id="bc-btn-create-group">Create</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Modal -->
+        <div class="bc-modal-overlay" id="bc-add-contact-modal" style="display: none; z-index: 1000;">
+            <div class="bc-modal" style="width: 440px; gap: 12px; padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 24px; position: relative;">
+                    <div id="bc-new-contact-avatar"
+                        style="width: 52px; height: 52px; border-radius: 50%; background: var(--bc-color-a); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: white;">
+                        ?</div>
+                    <h3 class="bc-modal-title" id="bc-contact-modal-title" style="margin: 0; font-size: 18px;">Add
+                        Contact</h3>
+                    <div style="display: flex; gap: 4px; margin-left: auto; align-items: center;">
+                        <div id="bc-contact-note-indicator" title="Contains Notes"
+                            style="display: none; color: #FFA31A; background: rgba(250, 163, 26, 0.1); padding: 8px; border-radius: 8px; border: 1px solid rgba(250, 163, 26, 0.15);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                            </svg>
+                        </div>
+                        <button class="bc-btn-cancel" id="bc-btn-delete-contact"
+                            style="display: none; color: var(--bc-text-muted); background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); cursor: pointer;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                </path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div style="position: relative;">
+                        <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--bc-text-muted); pointer-events: none;"
+                            width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <input type="text" class="bc-modal-input" placeholder="First Name" id="bc-contact-first"
+                            style="width: 100%; box-sizing: border-box; padding-left: 34px;">
+                    </div>
+                    <input type="text" class="bc-modal-input" placeholder="Last Name" id="bc-contact-last"
+                        style="width: 100%; box-sizing: border-box;">
+                </div>
+                <div style="position: relative;">
+                    <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--bc-text-muted); pointer-events: none;"
+                        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z">
+                        </path>
+                    </svg>
+                    <input type="text" class="bc-modal-input" placeholder="Phone Number" id="bc-contact-phone"
+                        style="width: 100%; box-sizing: border-box; padding-left: 34px;">
+                </div>
+                <div style="position: relative;">
+                    <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--bc-text-muted); pointer-events: none;"
+                        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <input type="text" class="bc-modal-input" placeholder="Email Address" id="bc-contact-email"
+                        style="width: 100%; box-sizing: border-box; padding-left: 34px;">
+                </div>
+                <h4 style="margin: 4px 0 0 0; font-size: 13px; color: var(--bc-text-muted);">Social Links</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <input type="text" class="bc-modal-input" placeholder="Twitter URL" id="bc-contact-twitter"
+                        style="width: 100%; box-sizing: border-box;">
+                    <input type="text" class="bc-modal-input" placeholder="LinkedIn URL" id="bc-contact-linkedin"
+                        style="width: 100%; box-sizing: border-box;">
+                    <input type="text" class="bc-modal-input" placeholder="Instagram URL" id="bc-contact-instagram"
+                        style="width: 100%; box-sizing: border-box;">
+                    <input type="text" class="bc-modal-input" placeholder="YouTube URL" id="bc-contact-youtube"
+                        style="width: 100%; box-sizing: border-box;">
+                    <input type="text" class="bc-modal-input" placeholder="Discord Username" id="bc-contact-whatsapp"
+                        style="width: 100%; box-sizing: border-box;">
+                    <input type="text" class="bc-modal-input" placeholder="Website URL" id="bc-contact-url"
+                        style="width: 100%; box-sizing: border-box;">
+                </div>
+                <h4 style="margin: 4px 0 0 0; font-size: 13px; color: var(--bc-text-muted);">Internal Notes</h4>
+                <textarea class="bc-modal-input" placeholder="Enter private notes..." id="bc-contact-notes"
+                    style="width: 100%; box-sizing: border-box; min-height: 56px; resize: vertical; padding: 12px; font-family: inherit; line-height: 1.5;"></textarea>
+                <h4 style="margin: 4px 0 0 0; font-size: 13px; color: var(--bc-text-muted);">Contact Bubble Colour</h4>
+                <div class="bc-color-picker" id="bc-contact-color-picker">
+                    <div class="bc-color-swatch selected" data-color="var(--bc-color-a)"
+                        style="background: var(--bc-color-a)"></div>
+                    <div class="bc-color-swatch" data-color="var(--bc-color-b)" style="background: var(--bc-color-b)">
+                    </div>
+                    <div class="bc-color-swatch" data-color="var(--bc-color-c)" style="background: var(--bc-color-c)">
+                    </div>
+                    <div class="bc-color-swatch" data-color="var(--bc-color-d)" style="background: var(--bc-color-d)">
+                    </div>
+                    <div class="bc-color-swatch" data-color="var(--bc-color-e)" style="background: var(--bc-color-e)">
+                    </div>
+                    <div class="bc-color-swatch" data-color="transparent"
+                        style="background: var(--bc-color-trans); border: 1px solid rgba(255,255,255,0.3);"></div>
+                </div>
+                <div class="bc-modal-actions"
+                    style="margin-top: 4px; display: flex; justify-content: flex-end; width: 100%;">
+                    <div style="display: flex; gap: 12px;">
+                        <button class="bc-btn-cancel" id="bc-btn-cancel-contact">Cancel</button>
+                        <button class="bc-btn-create" id="bc-btn-create-contact" style="background: #3A69F0;">Add
+                            Contact</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="bc-modal-overlay" id="bc-settings-modal" style="display: none; z-index: 1100;">
+            <div class="bc-modal">
+                <div class="bc-modal-header"
+                    style="padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 8px; justify-content: space-between; align-items: center; display: flex;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" style="color: var(--bc-accent);">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                            </path>
+                        </svg>
+                        <h3 class="bc-modal-title" style="margin: 0;">Settings</h3>
+                    </div>
+                    <button class="bc-btn-secondary" id="bc-btn-close-settings"
+                        style="padding: 8px 16px; font-size: 13px;">Close</button>
+                </div>
+                <div class="bc-settings-grid">
+                    <div class="bc-settings-column">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; opacity: 0.9;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path
+                                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
+                                </path>
+                            </svg>
+                            <h4
+                                style="font-size: 11px; color: var(--bc-text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin: 0;">
+                                General Settings</h4>
+                        </div>
+                        <div class="bc-settings-row">
+                            <div class="bc-settings-info">
+                                <div class="bc-settings-title">WhatsApp Call</div>
+                                <div class="bc-settings-desc">Quick call actions via WhatsApp</div>
+                            </div>
+                            <label class="bc-switch"><input type="checkbox" id="bc-setting-whatsapp-call"><span
+                                    class="bc-slider"></span></label>
+                        </div>
+                        <div class="bc-settings-row">
+                            <div class="bc-settings-info">
+                                <div class="bc-settings-title">Telegram Chat</div>
+                                <div class="bc-settings-desc">Quick chat actions via Telegram</div>
+                            </div>
+                            <label class="bc-switch"><input type="checkbox" id="bc-setting-telegram-chat"><span
+                                    class="bc-slider"></span></label>
+                        </div>
+                        <div class="bc-settings-row">
+                            <div class="bc-settings-info">
+                                <div class="bc-settings-title">Start in Bubble View</div>
+                                <div class="bc-settings-desc">Keep Bubbles as the default layout</div>
+                            </div>
+                            <label class="bc-switch"><input type="checkbox" id="bc-setting-start-bubble"><span
+                                    class="bc-slider"></span></label>
+                        </div>
+                        <div class="bc-settings-section" style="margin-top: 32px;">
+                            <div
+                                style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; opacity: 0.9;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.2" style="flex-shrink: 0;">
+                                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                                </svg>
+                                <h4
+                                    style="font-size: 11px; color: var(--bc-text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin: 0;">
+                                    Data Management</h4>
+                            </div>
+                            <div style="display: flex; gap: 12px;">
+                                <button class="bc-settings-btn" id="bc-export-data">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="17 8 12 3 7 8"></polyline>
+                                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                                    </svg>
+                                    Export
+                                </button>
+                                <button class="bc-settings-btn" id="bc-import-data">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    Import
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bc-settings-column">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px; opacity: 0.9;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" style="flex-shrink: 0;">
+                                <path d="M9 3h6v7l4 8H5l4-8V3z"></path>
+                                <path d="M9 3h6"></path>
+                            </svg>
+                            <h4
+                                style="font-size: 11px; color: var(--bc-text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin: 0;">
+                                Experimental Features</h4>
+                        </div>
+                        <div class="bc-settings-row"
+                            style="flex-direction: column; align-items: stretch; border-bottom: none;">
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--bc-border);">
+                                <div class="bc-settings-info">
+                                    <div class="bc-settings-title">Animations</div>
+                                    <div class="bc-settings-desc">Enable global motion and transitions</div>
+                                </div>
+                                <label class="bc-switch"><input type="checkbox" id="bc-setting-animations"><span
+                                        class="bc-slider"></span></label>
+                            </div>
+                            <div id="bc-animation-sub-settings"
+                                style="display: flex; flex-direction: column; padding-left: 24px; opacity: 0.5; pointer-events: none; transition: all 0.3s ease;">
+                                <div class="bc-settings-row">
+                                    <div class="bc-settings-info">
+                                        <div class="bc-settings-title">Fluid Motion</div>
+                                        <div class="bc-settings-desc">Enable smooth, organic easing profiles</div>
+                                    </div>
+                                    <label class="bc-switch"><input type="checkbox" id="bc-setting-fluid-motion"><span
+                                            class="bc-slider"></span></label>
+                                </div>
+                            </div>
+                            <div class="bc-settings-row">
+                                <div class="bc-settings-info">
+                                    <div class="bc-settings-title">Bubble Pop Mode</div>
+                                    <div class="bc-settings-desc">Atmospheric floating particles (interactive)</div>
+                                </div>
+                                <label class="bc-switch"><input type="checkbox" id="bc-setting-bg-bubbles"><span
+                                        class="bc-slider"></span></label>
+                            </div>
+                            <div class="bc-settings-row">
+                                <div class="bc-settings-info">
+                                    <div class="bc-settings-title">Bubble Sounds</div>
+                                    <div class="bc-settings-desc">Play a satisfying pop sound when you burst a bubble
+                                    </div>
+                                </div>
+                                <label class="bc-switch"><input type="checkbox" id="bc-setting-bubble-sounds"><span
+                                        class="bc-slider"></span></label>
+                            </div>
+                            <div class="bc-settings-row">
+                                <div class="bc-settings-info">
+                                    <div class="bc-settings-title">Animation SFX</div>
+                                    <div class="bc-settings-desc">Slimy interaction sounds when dragging bubbles</div>
+                                </div>
+                                <label class="bc-switch"><input type="checkbox" id="bc-setting-animation-sfx"><span
+                                        class="bc-slider"></span></label>
+                            </div>
+                        </div>
+                        <div class="bc-settings-row"
+                            style="flex-direction: column; align-items: flex-start; gap: 16px;">
+                            <div class="bc-settings-info">
+                                <div class="bc-settings-title">Theme Palette</div>
+                                <div class="bc-settings-desc">Switch between cinematic Dark (Vibrant) and sharp Lite
+                                    (Calm) aesthetics.</div>
+                            </div>
+                            <div class="bc-palette-selector" id="bc-settings-palette-selector">
+                                <div class="bc-palette-option vibrant active" data-theme="vibrant"
+                                    title="Dark Mode (Vibrant)"></div>
+                                <div class="bc-palette-option muted" data-theme="muted" title="Muted (Soft)"
+                                    style="display: none;"></div>
+                                <div class="bc-palette-option calm" data-theme="calm" title="Lite Mode (Calm)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="bubbles.js"></script>
+</body>
+
+</html>
